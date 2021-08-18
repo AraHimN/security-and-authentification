@@ -3,10 +3,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const hash = require("object-hash");
+const bcrypt = require("bcrypt");
 const schema = mongoose.Schema;
+const saltRound = 10;
 const app = express();
-
+var error = "";
 
 app.use(express.static("public"));
 app.set('view engine','ejs');
@@ -23,40 +24,51 @@ app.get("/",function(req,res){
   res.render("home");
 });
 app.get("/login",function(req,res){
-  res.render("login");
+  res.render("login",{message :error});
 });
 app.get("/register",function(req,res){
   res.render("register");
 });
 app.post("/register",function(req,res){
-const usr = new user({
-  email:req.body.username,
-  password: hash.MD5(req.body.password)
-});
-  usr.save(function(err){
-    if(err){
-      console.log(err);
-    }else{
-      res.render("secrets");
-    }
-  });
+
+  bcrypt.hash(req.body.password,saltRound,function(err,hash){
+     const usr = new user({
+      email:req.body.username,
+      password: hash
+    });
+    usr.save(function(err){
+      if(err){
+        res.redirect("/register");
+        console.log(err);
+      }else{
+        res.render("secrets");
+      }
+    });
+  })
+
+
 });
 
 app.post("/login",function(req,res){
+  let password=req.body.password;
   let email= req.body.username;
-  let password= hash.MD5(req.body.password);
-  user.find({email : email ,password : password},function(err,docs){
+  user.findOne({email : email},function(err,docs){
     if(err){
-      console.log(err.message);
+      error = err.message;
+     res.redirect("/login");
     }else{
-      if(docs.length === 0){
-        console.log("email or password incorrect");
-      }else{
+      bcrypt.compare(password,docs.password,function(err,result){
+        if(result==true){
           res.render("secrets");
-      }
-
+        }else{
+           error = "incorrect email or password ! ";
+          res.redirect("/login");
+        }
+      })
     }
   })
+
+
 })
 
 

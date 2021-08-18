@@ -8,6 +8,10 @@ body {
     text-align: center;
 }
 
+.error{
+  color: red;
+}
+
 .secret-text {
   text-align: center;
   font-size: 2rem;
