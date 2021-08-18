@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
+const hash = require("object-hash");
 const schema = mongoose.Schema;
 const app = express();
 
@@ -17,8 +17,6 @@ const userSchema = new schema ({
 email : String,
 password : String
 });
-
-userSchema.plugin(encrypt,{secret : process.env.SECRET,encryptedFields :["password"]});
 const user = mongoose.model("User",userSchema);
 
 app.get("/",function(req,res){
@@ -33,7 +31,7 @@ app.get("/register",function(req,res){
 app.post("/register",function(req,res){
 const usr = new user({
   email:req.body.username,
-  password: req.body.password
+  password: hash.MD5(req.body.password)
 });
   usr.save(function(err){
     if(err){
@@ -46,7 +44,7 @@ const usr = new user({
 
 app.post("/login",function(req,res){
   let email= req.body.username;
-  let password= req.body.password;
+  let password= hash.MD5(req.body.password);
   user.find({email : email ,password : password},function(err,docs){
     if(err){
       console.log(err.message);
@@ -54,7 +52,7 @@ app.post("/login",function(req,res){
       if(docs.length === 0){
         console.log("email or password incorrect");
       }else{
-          console.log(docs);
+          res.render("secrets");
       }
 
     }

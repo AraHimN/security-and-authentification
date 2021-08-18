@@ -15,6 +15,7 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "mongoose": "^5.13.7",
-    "mongoose-encryption": "^2.1.0"
+    "mongoose-encryption": "^2.1.0",
+    "object-hash": "^2.2.0"
   }
 }
