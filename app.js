@@ -47,7 +47,7 @@ const usr = new user({
 app.post("/login",function(req,res){
   let email= req.body.username;
   let password= req.body.password;
-  user.find({email : email ,paord : password},function(err,docs){
+  user.find({email : email ,password : password},function(err,docs){
     if(err){
       console.log(err.message);
     }else{
