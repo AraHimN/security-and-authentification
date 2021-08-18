@@ -53,8 +53,8 @@ app.post("/login",function(req,res){
   let password=req.body.password;
   let email= req.body.username;
   user.findOne({email : email},function(err,docs){
-    if(err){
-      error = err.message;
+    if(err || !docs){
+      error = "incorrect email or password ! ";
      res.redirect("/login");
     }else{
       bcrypt.compare(password,docs.password,function(err,result){
